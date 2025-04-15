@@ -7,6 +7,7 @@ import statsmodels.api as sm
 import random
 import time
 from datetime import date
+import statsmodels.tsa.stattools as ts
 
 # --- Helper function for chatbot ---
 def response_generator():
@@ -58,8 +59,8 @@ if "run_pairs_test" not in st.session_state:
 # --- Main Area: Stock UI and Analysis ---
 st.subheader("Compare and Backtest Stocks")
 
-stock1 = st.text_input("Enter first stock ticker (e.g. AAPL)", "AAPL")
-stock2 = st.text_input("Enter second stock ticker (e.g. MSFT)", "MSFT")
+stock1 = st.text_input("Enter first stock ticker (e.g. XOM)", "XOM")
+stock2 = st.text_input("Enter second stock ticker (e.g. CVX)", "CVX")
 start_date = st.date_input("Start Date", value=date(2023, 1, 1))
 end_date = st.date_input("End Date", value=date.today())
 
@@ -103,12 +104,18 @@ if "data1" in st.session_state and "data2" in st.session_state:
     ax2.set_title("Cumulative Return Comparison", fontsize=10)
     st.pyplot(fig2)
 
-    # Correlation
-    st.subheader("🔁 Correlation Analysis")
+    # Cointegration Test
+    st.subheader("🔗 Cointegration Test")
     joined = pd.concat([data1['Close'], data2['Close']], axis=1).dropna()
     joined.columns = [stock1, stock2]
-    correlation = joined.corr().iloc[0, 1]
-    st.write(f"Correlation between {stock1} and {stock2}: **{correlation:.4f}**")
+    coint_score, p_value, _ = ts.coint(joined[stock1], joined[stock2])
+
+    st.write(f"Cointegration test p-value between {stock1} and {stock2}: **{p_value:.4f}**")
+
+    if p_value < 0.05:
+        st.success("✅ The two series are cointegrated (reject the null hypothesis).")
+    else:
+        st.warning("❌ The two series are NOT cointegrated (fail to reject the null hypothesis).")
 
     # Pairs Trading
     if st.button("Run Pairs Trading Strategy"):
