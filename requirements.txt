@@ -14,7 +14,7 @@ langchain-chroma==0.2.2
 transformers==4.50.2
 sentence-transformers==2.2.2
 chromadb==0.4.18
-yfinance==0.2.52
+yfinance==0.2.55
 matplotlib==3.7.2
 statsmodels==0.14.0
 numpy==1.26.0

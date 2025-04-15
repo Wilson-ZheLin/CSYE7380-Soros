@@ -22,6 +22,8 @@ if "rag_system" not in st.session_state:
     st.session_state.rag_system = RAGSystem()
 if "chatbot" not in st.session_state:
     st.session_state.chatbot = ChatbotOpenAI(api_key=st.secrets["openai"]["api_key"])
+if "model_choice" not in st.session_state:
+    st.session_state.model_choice = 0
 
 # Chat-style UI without background colors
 for message in st.session_state.messages:
@@ -56,26 +58,44 @@ if chat_prompt:
             )
     
     st.session_state.messages.append({"role": "assistant", "content": response})
-    st.experimental_rerun()
+    st.rerun()
 
 st.sidebar.markdown("---")
 st.sidebar.subheader("📑 Upload Knowledge Base File")
+
+if "file_processed" not in st.session_state:
+    st.session_state.file_processed = False
+if "last_uploaded_file" not in st.session_state:
+    st.session_state.last_uploaded_file = None
 uploaded_file = st.sidebar.file_uploader("File supported: CSV", type=["csv"])
 if uploaded_file is not None:
-    try:
-        temp_csv_path = os.path.join(".", "temp_upload.csv")
-        with open(temp_csv_path, "wb") as f:
-            f.write(uploaded_file.getbuffer())
+    if not st.session_state.file_processed or st.session_state.last_uploaded_file != uploaded_file.name:
+        try:
+            temp_csv_path = os.path.join(".", "temp_upload.csv")
+            with open(temp_csv_path, "wb") as f:
+                f.write(uploaded_file.getbuffer())
+            
+            with st.sidebar:
+                with st.spinner("Creating index..."):
+                    st.session_state.rag_system.load_csv(temp_csv_path)
+                    st.success(f"Uploaded and indexed: {uploaded_file.name}")
+            
+            st.session_state.file_processed = True
+            st.session_state.last_uploaded_file = uploaded_file.name
         
-        with st.sidebar:
-            with st.spinner("Creating index..."):
-                rag_system = RAGSystem()
-                rag_system.load_csv(temp_csv_path)
-                st.session_state.rag_system = rag_system
-                st.success(f"Uploaded and indexed: {uploaded_file.name}")
-    
-    except Exception as e:
-        st.sidebar.error(f"Error: {e}")
+        except Exception as e:
+            st.sidebar.error(f"Error: {e}")
+            st.session_state.file_processed = False
+else:
+    st.session_state.file_processed = False
+    st.session_state.last_uploaded_file = None
+
+model_choice = st.sidebar.selectbox(
+    "Select Model",
+    ["Pre-trained Transformer", "OpenAI"],
+    index=0
+)
+st.session_state.model_choice = model_choice
 
 # --- Initialize state for pairs trading ---
 if "run_pairs_test" not in st.session_state:
