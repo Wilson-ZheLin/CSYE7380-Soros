@@ -172,3 +172,15 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Chroma vector database
+chroma_db/
+
+# macOS system files
+.DS_Store
+
+# Temporary uploaded files
+temp_upload.csv
+
+# Streamlit secrets
+.streamlit/secrets.toml
