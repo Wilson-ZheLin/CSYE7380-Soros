@@ -20,7 +20,7 @@ if "messages" not in st.session_state:
 if "rag_system" not in st.session_state:
     st.session_state.rag_system = RAGSystem()
 if "chatbot" not in st.session_state:
-    st.session_state.chatbot = ChatbotOpenAI()
+    st.session_state.chatbot = ChatbotOpenAI(api_key=st.secrets["openai"]["api_key"])
 
 # Chat-style UI without background colors
 for message in st.session_state.messages:
@@ -58,8 +58,8 @@ if chat_prompt:
     st.experimental_rerun()
 
 st.sidebar.markdown("---")
-st.sidebar.subheader("📑 Upload CSV file")
-uploaded_file = st.sidebar.file_uploader("Only support CSV file", type=["csv"])
+st.sidebar.subheader("📑 Upload Knowledge Base File")
+uploaded_file = st.sidebar.file_uploader("File supported: CSV", type=["csv"])
 if uploaded_file is not None:
     try:
         temp_csv_path = os.path.join(".", "temp_upload.csv")

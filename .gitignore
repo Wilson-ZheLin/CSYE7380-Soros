@@ -181,3 +181,6 @@ chroma_db/
 
 # Temporary uploaded files
 temp_upload.csv
+
+# Streamlit secrets
+.streamlit/secrets.toml
