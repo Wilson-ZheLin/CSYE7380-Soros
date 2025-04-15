@@ -178,3 +178,6 @@ chroma_db/
 
 # macOS system files
 .DS_Store
+
+# Temporary uploaded files
+temp_upload.csv

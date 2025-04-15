@@ -1,25 +1,13 @@
+import os
+import numpy as np
+import pandas as pd
 import streamlit as st
 import yfinance as yf
 import matplotlib.pyplot as plt
-import pandas as pd
-import numpy as np
 import statsmodels.api as sm
-import random
-import time
 from datetime import date
-
-# --- Helper function for chatbot ---
-def response_generator():
-    response = random.choice(
-        [
-            "Hello there! How can I assist you today?",
-            "Hi, human! Is there anything I can help you with?",
-            "Do you need help?",
-        ]
-    )
-    for word in response.split():
-        yield word + " "
-        time.sleep(0.05)
+from chatbot.rag import RAGSystem
+from chatbot.chatbot_openai import ChatbotOpenAI
 
 # --- Streamlit Layout ---
 st.set_page_config(layout="wide")
@@ -29,6 +17,10 @@ st.title("📈 Stock Comparison & Backtesting App")
 st.sidebar.title("🤖 Chat Assistant")
 if "messages" not in st.session_state:
     st.session_state.messages = []
+if "rag_system" not in st.session_state:
+    st.session_state.rag_system = RAGSystem()
+if "chatbot" not in st.session_state:
+    st.session_state.chatbot = ChatbotOpenAI()
 
 # Chat-style UI without background colors
 for message in st.session_state.messages:
@@ -47,9 +39,42 @@ st.sidebar.markdown("---")
 chat_prompt = st.sidebar.chat_input("Ask me anything...")
 if chat_prompt:
     st.session_state.messages.append({"role": "user", "content": chat_prompt})
-    response = "".join(response_generator())
+    
+    context = ""
+    if "rag_system" in st.session_state:
+        rag_results = st.session_state.rag_system.search(chat_prompt, k=1)
+        if rag_results:
+            context = "\n".join([result["content"] for result in rag_results])
+    
+    with st.sidebar:
+        with st.spinner("Reasoning..."):
+            response = st.session_state.chatbot.answer(
+                context=context,
+                query=chat_prompt,
+                chat_history=st.session_state.messages[:-1]
+            )
+    
     st.session_state.messages.append({"role": "assistant", "content": response})
     st.experimental_rerun()
+
+st.sidebar.markdown("---")
+st.sidebar.subheader("📑 Upload CSV file")
+uploaded_file = st.sidebar.file_uploader("Only support CSV file", type=["csv"])
+if uploaded_file is not None:
+    try:
+        temp_csv_path = os.path.join(".", "temp_upload.csv")
+        with open(temp_csv_path, "wb") as f:
+            f.write(uploaded_file.getbuffer())
+        
+        with st.sidebar:
+            with st.spinner("Creating index..."):
+                rag_system = RAGSystem()
+                rag_system.load_csv(temp_csv_path)
+                st.session_state.rag_system = rag_system
+                st.success(f"Uploaded and indexed: {uploaded_file.name}")
+    
+    except Exception as e:
+        st.sidebar.error(f"Error: {e}")
 
 # --- Initialize state for pairs trading ---
 if "run_pairs_test" not in st.session_state:
