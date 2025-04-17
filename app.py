@@ -1,3 +1,7 @@
+__import__('pysqlite3')
+import sys
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+
 import os
 import numpy as np
 import pandas as pd
@@ -9,10 +13,6 @@ from datetime import date
 import statsmodels.tsa.stattools as ts
 from chatbot.rag import RAGSystem
 from chatbot.chatbot_openai import ChatbotOpenAI
-
-import sys
-import pysqlite3
-sys.modules["sqlite3"] = pysqlite3
 
 # --- Streamlit Layout ---
 st.set_page_config(layout="wide")
