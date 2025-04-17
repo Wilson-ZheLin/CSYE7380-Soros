@@ -7,12 +7,6 @@ Local Installation
 
 ### Prerequisites
 
-To run `app.py`, you'll need:
-* [Python](https://www.python.org/downloads/)
-    
-
-### Prerequisites
-
 To run both `app.py` and tensorflow model, you'll need:
 * Python 3.9
 
