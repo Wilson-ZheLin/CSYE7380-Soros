@@ -18,7 +18,7 @@ yfinance==0.2.55
 matplotlib==3.7.2
 statsmodels==0.14.0
 numpy==1.26.0
-pysqlite3-binary==0.5.2
+# pysqlite3-binary==0.5.2
 
 # Self trained Transformer inference
 tensorflow-addons==0.17.1
