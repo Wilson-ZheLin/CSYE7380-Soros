@@ -10,12 +10,18 @@ Local Installation
 To run `app.py`, you'll need:
 * [Python](https://www.python.org/downloads/)
     
+
+### Prerequisites
+
+To run both `app.py` and tensorflow model, you'll need:
+* Python 3.9
+
 ### Installation
 
-
 1.  Setup your acceleration environment Apple Silicon only:
+
 ```zsh
-conda create -n chatbot python=3.8
+conda create -n chatbot python=3.9
 conda activate chatbot
 conda install -c apple tensorflow-deps -y
 pip install tensorflow-macos==2.9.1
