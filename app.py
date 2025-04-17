@@ -49,9 +49,12 @@ if chat_prompt:
     
     context = ""
     if "rag_system" in st.session_state:
-        rag_results = st.session_state.rag_system.search(chat_prompt, k=1)
-        if rag_results:
-            context = "\n".join([result["content"] for result in rag_results])
+        try:
+            rag_results = st.session_state.rag_system.search(chat_prompt, k=1)
+            if rag_results:
+                context = "\n".join([result["content"] for result in rag_results])
+        except ValueError:
+            context = ""
     
     with st.sidebar:
         with st.spinner("Reasoning..."):

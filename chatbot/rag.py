@@ -52,7 +52,7 @@ class RAGSystem:
     def search(self, query, k=1):
 
         if self.vectordb is None:
-            raise ValueError("Please load a CSV file or initialize vector database first")
+            return []
 
         results = self.vectordb.similarity_search_with_score(query, k=k)
 
