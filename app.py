@@ -13,6 +13,7 @@ from datetime import date
 import statsmodels.tsa.stattools as ts
 from chatbot.rag import RAGSystem
 from chatbot.chatbot_openai import ChatbotOpenAI
+from chatbot.chatbot_model import get_transformer_response
 
 # --- Streamlit Layout ---
 st.set_page_config(layout="wide")
@@ -27,7 +28,15 @@ if "rag_system" not in st.session_state:
 if "chatbot" not in st.session_state:
     st.session_state.chatbot = ChatbotOpenAI(api_key=st.secrets["openai"]["api_key"])
 if "model_choice" not in st.session_state:
-    st.session_state.model_choice = 0
+    st.session_state.model_choice = "Pre-trained Transformer"
+
+# Model selection
+model_choice = st.sidebar.selectbox(
+    "Select Model",
+    ["Pre-trained Transformer", "RAG with OpenAI"],
+    index=0
+)
+st.session_state.model_choice = model_choice
 
 # Chat-style UI without background colors
 for message in st.session_state.messages:
@@ -44,25 +53,32 @@ for message in st.session_state.messages:
 
 st.sidebar.markdown("---")
 chat_prompt = st.sidebar.chat_input("Ask me anything...")
+
 if chat_prompt:
     st.session_state.messages.append({"role": "user", "content": chat_prompt})
     
-    context = ""
-    if "rag_system" in st.session_state:
-        try:
-            rag_results = st.session_state.rag_system.search(chat_prompt, k=1)
-            if rag_results:
-                context = "\n".join([result["content"] for result in rag_results])
-        except ValueError:
-            context = ""
-    
-    with st.sidebar:
-        with st.spinner("Reasoning..."):
-            response = st.session_state.chatbot.answer(
-                context=context,
-                query=chat_prompt,
-                chat_history=st.session_state.messages[:-1]
-            )
+    if st.session_state.model_choice == "RAG with OpenAI":
+        context = ""
+        if "rag_system" in st.session_state:
+            try:
+                rag_results = st.session_state.rag_system.search(chat_prompt, k=1)
+                if rag_results:
+                    context = "\n".join([result["content"] for result in rag_results])
+            except ValueError:
+                context = ""
+        
+        with st.sidebar:
+            with st.spinner("Reasoning..."):
+                response = st.session_state.chatbot.answer(
+                    context=context,
+                    query=chat_prompt,
+                    chat_history=st.session_state.messages[:-1]
+                )
+    elif st.session_state.model_choice == "Pre-trained Transformer":
+        with st.sidebar:
+            with st.spinner("Reasoning..."):
+                api_url = st.secrets["transformer"]["url"]
+                response = get_transformer_response(api_url, chat_prompt)
     
     st.session_state.messages.append({"role": "assistant", "content": response})
     st.rerun()
@@ -93,13 +109,6 @@ if uploaded_file is not None:
         except Exception as e:
             st.sidebar.error(f"Error: {e}")
             st.session_state.file_processed = False
-
-model_choice = st.sidebar.selectbox(
-    "Select Model",
-    ["RAG with OpenAI", "Pre-trained Transformer"],
-    index=0
-)
-st.session_state.model_choice = model_choice
 
 # --- Initialize state for pairs trading ---
 if "run_pairs_test" not in st.session_state:

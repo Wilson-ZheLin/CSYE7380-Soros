@@ -31,6 +31,7 @@ pip install -r requirements.txt
 3. Set up API keys (if you'd like to use OpenAI Chatbot):
    - Copy `.streamlit/secrets.toml.example` to `.streamlit/secrets.toml`
    - Add your OpenAI API key
+   - Add the API url for the pre-trained transformer
 
 4. Setup models and tokenizers
    - Download from https://drive.google.com/drive/folders/1WbeLh4gMiVXr48wn-Xn3mhmH0WY2gxV1
