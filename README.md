@@ -1,5 +1,7 @@
 # CSYE7380-Soros
 
+**Try Our Live Demo Here:** [https://soros-csye7380.streamlit.app](https://soros-csye7380.streamlit.app)
+
 Local Installation
 ------------------
 

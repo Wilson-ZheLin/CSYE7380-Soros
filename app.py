@@ -93,9 +93,6 @@ if uploaded_file is not None:
         except Exception as e:
             st.sidebar.error(f"Error: {e}")
             st.session_state.file_processed = False
-else:
-    st.session_state.file_processed = False
-    st.session_state.last_uploaded_file = None
 
 model_choice = st.sidebar.selectbox(
     "Select Model",
