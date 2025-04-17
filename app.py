@@ -10,6 +10,10 @@ import statsmodels.tsa.stattools as ts
 from chatbot.rag import RAGSystem
 from chatbot.chatbot_openai import ChatbotOpenAI
 
+import sys
+import pysqlite3
+sys.modules["sqlite3"] = pysqlite3
+
 # --- Streamlit Layout ---
 st.set_page_config(layout="wide")
 st.title("📈 Stock Comparison & Backtesting App")
