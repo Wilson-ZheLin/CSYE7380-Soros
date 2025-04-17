@@ -21,7 +21,6 @@ numpy==1.26.0
 pysqlite3-binary==0.5.2
 
 # Self trained Transformer inference
-tensorflow==2.9.1
 tensorflow-addons==0.17.1
 tensorflow-datasets==4.6.0
 protobuf==3.19.6

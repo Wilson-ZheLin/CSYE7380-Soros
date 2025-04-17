@@ -11,21 +11,33 @@ To run `app.py`, you'll need:
 * [Python](https://www.python.org/downloads/)
     
 ### Installation
-1. Install the required packages
+
+
+1.  Setup your acceleration environment Apple Silicon only:
+```zsh
+conda create -n chatbot python=3.8
+conda activate chatbot
+conda install -c apple tensorflow-deps -y
+pip install tensorflow-macos==2.9.1
+pip install tensorflow-metal==0.5.0
+```
+
+2. Install the required packages
 
 ```
 pip install -r requirements.txt
 ```
 
-2. Set up API keys (if you'd like to use OpenAI Chatbot):
+3. Set up API keys (if you'd like to use OpenAI Chatbot):
    - Copy `.streamlit/secrets.toml.example` to `.streamlit/secrets.toml`
    - Add your OpenAI API key
 
-3. Setup models and tokenizers
+4. Setup models and tokenizers
    - Download from https://drive.google.com/drive/folders/1WbeLh4gMiVXr48wn-Xn3mhmH0WY2gxV1
    - Place both model.h5 and tokenizer.subwords in `chatbot/models`
 
-4. Run `app.py` on your local machine
+
+5. Run `app.py` on your local machine
 
 ```
 streamlit run app.py
