@@ -92,7 +92,7 @@ else:
 
 model_choice = st.sidebar.selectbox(
     "Select Model",
-    ["Pre-trained Transformer", "OpenAI"],
+    ["RAG with OpenAI", "Pre-trained Transformer"],
     index=0
 )
 st.session_state.model_choice = model_choice
@@ -155,12 +155,16 @@ if "data1" in st.session_state and "data2" in st.session_state:
     joined.columns = [stock1, stock2]
     coint_score, p_value, _ = ts.coint(joined[stock1], joined[stock2])
 
-    st.write(f"Cointegration test p-value between {stock1} and {stock2}: **{p_value:.4f}**")
+    st.markdown(
+        f"Cointegration test p-value between {stock1} and {stock2}: "
+        f"<span style='color:seagreen; font-weight:bold;'>{p_value:.4f}</span>",
+        unsafe_allow_html=True
+    )
 
     if p_value < 0.05:
         st.success("✅ The two series are cointegrated (reject the null hypothesis).")
     else:
-        st.warning("❌ The two series are NOT cointegrated (fail to reject the null hypothesis).")
+        st.warning("⚠️ The two series are NOT cointegrated (fail to reject the null hypothesis).")
 
     # Pairs Trading
     if st.button("Run Pairs Trading Strategy"):
@@ -213,7 +217,8 @@ if "data1" in st.session_state and "data2" in st.session_state:
         pnl_amount = final_pnl * initial_capital
         pct_return = pnl_amount / initial_capital * 100
 
-        st.write(f"💰 Strategy Result:")
-        st.write(f"- Final PnL (Spread units): {final_pnl:.4f}")
-        st.write(f"- Simulated Profit (on $10,000): ${pnl_amount:.2f}")
-        st.write(f"- Return: {pct_return:.2f}%")
+        st.markdown("### 💰 Strategy Result")
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Final PnL (Spread units)", f"{final_pnl:.4f}")
+        col2.metric("Profit (on $10,000)", f"${pnl_amount:.2f}")
+        col3.metric("Return", f"{pct_return:.2f}%")
